@@ -1,5 +1,7 @@
-import { fetchMovieById, fetchMoviesBySearch } from "../slices/movies";
+import Paths from "../paths";
+import { fetchMoviesBySearch } from "../slices/movies";
 import { useAppDispatch } from "../hooks";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
@@ -8,6 +10,7 @@ type SearchFormProps = { by: "id" | "title" };
 export default function SearchForm({ by }: SearchFormProps) {
   const [value, setValue] = useState("");
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
@@ -17,8 +20,7 @@ export default function SearchForm({ by }: SearchFormProps) {
 
     switch (by) {
       case "id":
-        dispatch(fetchMovieById(value));
-        setValue("");
+        navigate(Paths.MOVIE(value));
         break;
       case "title":
         dispatch(fetchMoviesBySearch(value));

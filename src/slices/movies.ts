@@ -2,6 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AppState } from "../store";
 import type { PayloadAction, SerializedError } from "@reduxjs/toolkit";
 
+type MovieById =
+  | { Response: "Undefined" }
+  | { Response: "False"; Error: string }
+  | { Response: "True" } & MovieFullInfo;
 type MoviesBySearch =
   | { Response: "Undefined" }
   | { Response: "False"; Error: string }
@@ -10,7 +14,7 @@ type MoviesBySearch =
 interface MoviesState {
   error: SerializedError | null;
   loading: boolean;
-  movieById: MovieFullInfo | null;
+  movieById: MovieById;
   moviesBySearch: MoviesBySearch;
   moviesFavorite: MovieShortInfo[];
 }
@@ -35,7 +39,6 @@ export interface MovieFullInfo extends MovieShortInfo {
   BoxOffice: string;
   Production: string;
   Website: string;
-  Response: string;
 }
 
 export interface MovieShortInfo {
@@ -49,7 +52,7 @@ export interface MovieShortInfo {
 const initialState: MoviesState = {
   error: null,
   loading: false,
-  movieById: null,
+  movieById: { Response: "Undefined" },
   moviesBySearch: { Response: "Undefined" },
   moviesFavorite: [],
 };
@@ -64,7 +67,7 @@ export const fetchMovieById = createAsyncThunk("movies/fetchMovieById", async (i
   }
   const data = await response.json();
 
-  return data as MovieFullInfo;
+  return data as MovieById;
 });
 export const fetchMoviesBySearch = createAsyncThunk("movies/fetchMoviesBySearch", async (title: string) => {
   const response = await fetch(`${url}&s=${title}`);
@@ -94,10 +97,10 @@ export const movies = createSlice({
       .addCase(fetchMovieById.pending, (state) => {
         state.error = null;
         state.loading = true;
-        state.movieById = null;
+        state.movieById = { Response: "Undefined" };
         state.moviesBySearch = { Response: "Undefined" };
       })
-      .addCase(fetchMovieById.fulfilled, (state, action: PayloadAction<MovieFullInfo>) => {
+      .addCase(fetchMovieById.fulfilled, (state, action: PayloadAction<MovieById>) => {
         state.loading = false;
         state.movieById = action.payload;
       })
@@ -109,7 +112,7 @@ export const movies = createSlice({
       .addCase(fetchMoviesBySearch.pending, (state) => {
         state.error = null;
         state.loading = true;
-        state.movieById = null;
+        state.movieById = { Response: "Undefined" };
         state.moviesBySearch = { Response: "Undefined" };
       })
       .addCase(fetchMoviesBySearch.fulfilled, (state, action: PayloadAction<MoviesBySearch>) => {

@@ -1,5 +1,6 @@
 import Loading from "../components/Loading";
 import MovieCard from "../components/MovieCard";
+import NotFound from "../components/NotFound";
 import { fetchMovieById, selectLoading, selectMovieById } from "../slices/movies";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useEffect } from "react";
@@ -20,7 +21,8 @@ export default function Movie() {
   return (
     <>
       {loading && <Loading />}
-      {movieById && <MovieCard info={movieById} />}
+      {movieById.Response === "False" && <NotFound>Фильм не найден</NotFound>}
+      {movieById.Response === "True" && <MovieCard info={movieById} />}
     </>
   );
 };
